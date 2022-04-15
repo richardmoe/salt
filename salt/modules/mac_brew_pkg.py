@@ -108,12 +108,18 @@ def _call_brew(*cmd, failhard=True):
     """
     Calls the brew command with the user account of brew
     """
-    user = __salt__["file.get_user"](_homebrew_bin())
+    brew_bin = _homebrew_bin()
+    user = __salt__["file.get_user"](brew_bin)
     runas = user if user != __opts__["user"] else None
     _cmd = []
     if runas:
         _cmd = ["sudo -i -n -H -u {} -- ".format(runas)]
-    _cmd = _cmd + [salt.utils.path.which("brew")] + list(cmd)
+    if "Apple" in __salt__["cmd.run"](
+        "sysctl machdep.cpu.brand_string"
+    ) and brew_bin.startswith("/opt/homebrew"):
+        _cmd = _cmd + ["arch", "-arm64"]
+
+    _cmd = _cmd + [brew_bin] + list(cmd)
     _cmd = " ".join(_cmd)
 
     runas = None
