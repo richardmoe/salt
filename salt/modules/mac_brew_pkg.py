@@ -257,8 +257,13 @@ def latest_version(*names, **kwargs):
         refresh_db()
 
     def get_version(pkg_info):
+        suffix = ""
+        if pkg_info["revision"] > 0:
+            suffix = "_" + str(pkg_info["revision"])
         # Perhaps this will need an option to pick devel by default
-        return pkg_info["versions"]["stable"] or pkg_info["versions"]["devel"]
+        return (
+            pkg_info["versions"]["stable"] or pkg_info["versions"]["devel"]
+        ) + suffix
 
     versions_dict = {key: get_version(val) for key, val in _info(*names).items()}
 
