@@ -465,8 +465,8 @@ def test_delete_key_with_passphrase_without_gpg_passphrase_in_pillar(gpghome):
     ]
 
     _expected_result = {
-        "res": True,
-        "message": "gpg_passphrase not available in pillar.",
+        "res": False,
+        "message": "Failed to delete secret key for xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx: gpg_passphrase not available in pillar.",
     }
 
     mock_opt = MagicMock(return_value="root")
@@ -1066,7 +1066,11 @@ def test_gpg_delete_key_honors_gnupghome():
             gnupghome = "/pls_respect_me"
             get_key.return_value = None
             gpg.delete_key("foo", gnupghome=gnupghome)
-            create.assert_called_with(None, gnupghome)
+            create.assert_called_with(user=None, gnupghome=gnupghome, keyring=None)
             get_key.assert_called_with(
-                keyid="foo", fingerprint=None, user=None, gnupghome=gnupghome
+                keyid="foo",
+                fingerprint=None,
+                user=None,
+                gnupghome=gnupghome,
+                keyring=None,
             )

@@ -208,12 +208,14 @@ def test_gpg_absent_no_changes(gpg_delete):
     ],
     indirect=["gpg_delete"],
 )
-@pytest.mark.usefixtures("gpg_list_keys")
-def test_gpg_absent_delete_key(gpg_delete, expected):
-    ret = gpg.absent("A")
-    assert ret["result"] == expected
-    assert bool(ret["changes"]) == expected
-    gpg_delete.assert_called_once()
+def test_gpg_absent_delete_key(gpg_delete, expected, keys_list):
+    list_ = Mock(spec="salt.modules.gpg.list_keys")
+    list_.side_effect = (keys_list, [x for x in keys_list if x["keyid"] != "A"])
+    with patch.dict(gpg.__salt__, {"gpg.list_keys": list_}):
+        ret = gpg.absent("A")
+        assert ret["result"] == expected
+        assert bool(ret["changes"]) == expected
+        gpg_delete.assert_called_once()
 
 
 @pytest.mark.usefixtures("gpg_list_keys")
@@ -229,7 +231,7 @@ def test_gpg_absent_list_keys_with_gnupghome_and_user(gpg_list_keys):
     gnupghome = "/pls_respect_me"
     user = "imthereaswell"
     gpg.absent("nonexistent", gnupghome=gnupghome, user=user)
-    gpg_list_keys.assert_called_with(gnupghome=gnupghome, user=user)
+    gpg_list_keys.assert_called_with(gnupghome=gnupghome, user=user, keyring=None)
 
 
 @pytest.mark.usefixtures("gpg_list_keys")
@@ -238,4 +240,6 @@ def test_gpg_absent_delete_key_called_with_correct_kwargs(gpg_delete):
     user = "hellothere"
     gnupghome = "/pls_sir"
     gpg.absent(key, user=user, gnupghome=gnupghome)
-    gpg_delete.assert_called_with(keyid=key, gnupghome=gnupghome, user=user)
+    gpg_delete.assert_called_with(
+        keyid=key, gnupghome=gnupghome, user=user, keyring=None, use_passphrase=False
+    )
