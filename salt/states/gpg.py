@@ -109,10 +109,12 @@ def present(
                             keyid=key,
                             trust_level=trust,
                             user=user,
+                            gnupghome=gnupghome,
+                            keyring=keyring,
                         )
                         if result["res"] is False:
                             ret["result"] = result["res"]
-                            ret["comment"].extend(result["message"])
+                            ret["comment"].append(result["message"])
                         else:
                             salt.utils.dictupdate.set_dict_key_value(
                                 ret, f"changes:{key}:trust", trust
@@ -159,10 +161,12 @@ def present(
                         keyid=key,
                         trust_level=trust,
                         user=user,
+                        gnupghome=gnupghome,
+                        keyring=keyring,
                     )
                     if result["res"] is False:
                         ret["result"] = result["res"]
-                        ret["comment"].extend(result["message"])
+                        ret["comment"].append(result["message"])
                     else:
                         ret["comment"].append(f"Set trust level for {key} to {trust}")
                 else:
@@ -276,7 +280,7 @@ def absent(
         and __salt__["file.file_exists"](keyring)
     ):
         __salt__["file.remove"](keyring)
-        ret["comment"].append(f"Removed keyring file {keyring}")
+        ret["comment"].append(f"Removed empty keyring file {keyring}")
         ret["changes"]["removed"] = keyring
 
     ret["comment"] = "\n".join(ret["comment"])
