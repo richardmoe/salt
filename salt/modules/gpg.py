@@ -129,7 +129,7 @@ def _get_user_info(user=None):
             # if it doesn't exist then fall back to user Salt running as
             userinfo = _get_user_info()
         else:
-            raise SaltInvocationError("User {} does not exist".format(user))
+            raise SaltInvocationError(f"User {user} does not exist")
 
     return userinfo
 
@@ -153,10 +153,8 @@ def _restore_ownership(func):
         Wrap gpg function calls to fix permissions
         """
         user = kwargs.get("user")
-        gnupghome = kwargs.get("gnupghome")
-
-        if not gnupghome:
-            gnupghome = _get_user_gnupghome(user)
+        gnupghome = kwargs.get("gnupghome", _get_user_gnupghome(user))
+        keyring = kwargs.get("keyring")
 
         userinfo = _get_user_info(user)
         run_user = _get_user_info()
@@ -169,10 +167,10 @@ def _restore_ownership(func):
                 group = __salt__["file.gid_to_group"](run_user["gid"])
                 for path in [gnupghome] + __salt__["file.find"](gnupghome):
                     __salt__["file.chown"](path, run_user["name"], group)
-            if "keyring" in kwargs and os.path.exists(kwargs["keyring"]):
+            if keyring and os.path.exists(keyring):
                 if group is None:
                     group = __salt__["file.gid_to_group"](run_user["gid"])
-                __salt__["file.chown"](path, run_user["name"], group)
+                __salt__["file.chown"](keyring, run_user["name"], group)
 
         # Filter special kwargs
         for key in list(kwargs):
@@ -185,8 +183,8 @@ def _restore_ownership(func):
             group = __salt__["file.gid_to_group"](userinfo["gid"])
             for path in [gnupghome] + __salt__["file.find"](gnupghome):
                 __salt__["file.chown"](path, user, group)
-            if "keyring" in kwargs and os.path.exists(kwargs["keyring"]):
-                __salt__["file.chown"](path, user, group)
+            if keyring and os.path.exists(keyring):
+                __salt__["file.chown"](keyring, user, group)
         return ret
 
     return func_wrapper
@@ -963,9 +961,7 @@ def export_key(
     if result:
         if not bare:
             if output:
-                ret["comment"] = "Exported key data has been written to {}".format(
-                    output
-                )
+                ret["comment"] = f"Exported key data has been written to {output}"
             else:
                 ret["comment"] = result
         else:
@@ -1033,13 +1029,11 @@ def receive_keys(keyserver=None, keys=None, user=None, gnupghome=None, keyring=N
                 if "ok" in result:
                     if result["ok"] == "1":
                         ret["message"].append(
-                            "Key {} added to keychain".format(result["fingerprint"])
+                            f"Key {result['fingerprint']} added to keychain"
                         )
                     elif result["ok"] == "0":
                         ret["message"].append(
-                            "Key {} already exists in keychain".format(
-                                result["fingerprint"]
-                            )
+                            f"Key {result['fingerprint']} already exists in keychain"
                         )
                 elif "problem" in result:
                     ret["message"].append("Unable to add key to keychain")
@@ -1112,20 +1106,24 @@ def trust_key(
             "ERROR: Valid trust levels - {}".format(",".join(NUM_TRUST_DICT.keys()))
         )
 
-    if not fingerprint:
-        key = get_key(keyid, user=user, gnupghome=gnupghome, keyring=keyring)
-        if key:
-            if "fingerprint" not in key:
-                ret["res"] = False
-                ret["message"] = f"Fingerprint not found for keyid {keyid}"
-                return ret
-            fingerprint = key["fingerprint"]
-        else:
-            ret["res"] = False
-            ret["message"] = f"KeyID {keyid} not in GPG keychain"
-            return ret
-
+    key = get_key(
+        keyid=keyid,
+        fingerprint=fingerprint,
+        user=user,
+        gnupghome=gnupghome,
+        keyring=keyring,
+    )
+    if not key:
+        ret["res"] = False
+        ret["message"] = f"KeyID {keyid} not in GPG keychain"
+        return ret
+    if not fingerprint and "fingerprint" not in key:
+        ret["res"] = False
+        ret["message"] = f"Fingerprint not found for keyid {keyid}"
+        return ret
+    fingerprint = fingerprint or key["fingerprint"]
     gpg = _create_gpg(user=user, gnupghome=gnupghome, keyring=keyring)
+
     try:
         res = gpg.trust_keys(fingerprint, TRUST_KEYS_TRUST_LEVELS[trust_level])
     except AttributeError:
@@ -1462,7 +1460,7 @@ def encrypt(
     if result.ok:
         if not bare:
             if output:
-                ret["comment"] = "Encrypted data has been written to {}".format(output)
+                ret["comment"] = f"Encrypted data has been written to {output}"
             else:
                 ret["comment"] = result.data
         else:
@@ -1470,9 +1468,7 @@ def encrypt(
     else:
         if not bare:
             ret["res"] = False
-            ret["comment"] = "{}.\nPlease check the salt-minion log.".format(
-                result.status
-            )
+            ret["comment"] = f"{result.status}.\nPlease check the salt-minion log."
         else:
             ret = False
 
@@ -1558,7 +1554,7 @@ def decrypt(
     if result.ok:
         if not bare:
             if output:
-                ret["comment"] = "Decrypted data has been written to {}".format(output)
+                ret["comment"] = f"Decrypted data has been written to {output}"
             else:
                 ret["comment"] = result.data
         else:
@@ -1566,9 +1562,7 @@ def decrypt(
     else:
         if not bare:
             ret["res"] = False
-            ret["comment"] = "{}.\nPlease check the salt-minion log.".format(
-                result.status
-            )
+            ret["comment"] = f"{result.status}.\nPlease check the salt-minion log."
         else:
             ret = False
 
