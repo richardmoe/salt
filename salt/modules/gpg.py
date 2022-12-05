@@ -1,6 +1,5 @@
 """
-Manage a GPG keychains, add keys, create keys, retrieve keys from keyservers.
-Sign, encrypt and sign plus encrypt text and files.
+Manage GPG keychains and keys, sign and encrypt text and files.
 
 .. versionadded:: 2015.5.0
 
@@ -209,7 +208,7 @@ def _create_gpg(user=None, gnupghome=None, keyring=None):
 
 def _list_keys(secret=False, user=None, gnupghome=None, keyring=None):
     """
-    Helper function for Listing keys
+    Helper function for listing keys
     """
     gpg = _create_gpg(user=user, gnupghome=gnupghome, keyring=keyring)
     _keys = gpg.list_keys(secret)
@@ -230,7 +229,7 @@ def _search_keys(text, keyserver, user=None, gnupghome=None):
 
 def search_keys(text, keyserver=None, user=None, gnupghome=None):
     """
-    Search keys from keyserver
+    Search keys on a keyserver
 
     text
         Text to search the keyserver for, e.g. email address, keyID or fingerprint.
@@ -240,11 +239,11 @@ def search_keys(text, keyserver=None, user=None, gnupghome=None):
 
     user
         Which user's keychain to access, defaults to user Salt is running as.
-        Passing the user as ``salt`` will set the GnuPG home directory to the
+        Passing the user as ``salt`` will set the GnuPG home directory to
         ``/etc/salt/gpgkeys``.
 
     gnupghome
-        Specify the location where GPG keyring and related files are stored.
+        Specify the location where the GPG keyring and related files are stored.
 
         .. versionadded:: 3006
 
@@ -290,11 +289,11 @@ def list_keys(user=None, gnupghome=None, keyring=None):
 
     user
         Which user's keychain to access, defaults to user Salt is running as.
-        Passing the user as ``salt`` will set the GnuPG home directory to the
+        Passing the user as ``salt`` will set the GnuPG home directory to
         ``/etc/salt/gpgkeys``.
 
     gnupghome
-        Specify the location where GPG keyring and related files are stored.
+        Specify the location where the GPG keyring and related files are stored.
 
     keyring
         Limit the operation to this specific keyring, specified as
@@ -347,11 +346,11 @@ def list_secret_keys(user=None, gnupghome=None, keyring=None):
 
     user
         Which user's keychain to access, defaults to user Salt is running as.
-        Passing the user as ``salt`` will set the GnuPG home directory to the
+        Passing the user as ``salt`` will set the GnuPG home directory to
         ``/etc/salt/gpgkeys``.
 
     gnupghome
-        Specify the location where GPG keyring and related files are stored.
+        Specify the location where the GPG keyring and related files are stored.
 
     keyring
         Limit the operation to this specific keyring, specified as
@@ -423,7 +422,7 @@ def create_key(
         GPG key generation requires *a lot* of entropy and randomness.
         Difficult to do over a remote connection, consider having
         another process available which is generating randomness for
-        the machine.  Also especially difficult on virtual machines,
+        the machine. Also especially difficult on virtual machines,
         consider the `rng-tools
         <http://www.gnu.org/software/hurd/user/tlecarrour/rng-tools.html>`_
         package.
@@ -459,16 +458,16 @@ def create_key(
         an epoch value, or 0 for a non-expiring key.
 
     use_passphrase
-        Whether to use a passphrase with the signing key. Passphrase is received
-        from Pillar.
+        Whether to use a passphrase with the signing key. Passphrase is retrieved
+        from Pillar value ``gpg_passphrase``.
 
     user
         Which user's keychain to access, defaults to user Salt is running as.
-        Passing the user as ``salt`` will set the GnuPG home directory to the
+        Passing the user as ``salt`` will set the GnuPG home directory to
         ``/etc/salt/gpgkeys``.
 
     gnupghome
-        Specify the location where GPG keyring and related files are stored.
+        Specify the location where the GPG keyring and related files are stored.
 
     keyring
         Limit the operation to this specific keyring, specified as
@@ -548,7 +547,7 @@ def delete_key(
     keyring=None,
 ):
     """
-    Get a key from the GPG keychain
+    Delete a key from the GPG keychain
 
     keyid
         The keyid of the key to be deleted.
@@ -562,15 +561,15 @@ def delete_key(
 
     user
         Which user's keychain to access, defaults to user Salt is running as.
-        Passing the user as ``salt`` will set the GnuPG home directory to the
+        Passing the user as ``salt`` will set the GnuPG home directory to
         ``/etc/salt/gpgkeys``.
 
     gnupghome
-        Specify the location where GPG keyring and related files are stored.
+        Specify the location where the GPG keyring and related files are stored.
 
     use_passphrase
-        Whether to use a passphrase with the signing key. Passphrase is received
-        from Pillar.
+        Whether to use a passphrase with the signing key. Passphrase is retrieved
+        from Pillar value ``gpg_passphrase``.
 
         .. versionadded:: 3003
 
@@ -679,11 +678,11 @@ def get_key(keyid=None, fingerprint=None, user=None, gnupghome=None, keyring=Non
 
     user
         Which user's keychain to access, defaults to user Salt is running as.
-        Passing the user as ``salt`` will set the GnuPG home directory to the
+        Passing the user as ``salt`` will set the GnuPG home directory to
         ``/etc/salt/gpgkeys``.
 
     gnupghome
-        Specify the location where GPG keyring and related files are stored.
+        Specify the location where the GPG keyring and related files are stored.
 
     keyring
         Limit the operation to this specific keyring, specified as
@@ -743,7 +742,7 @@ def get_secret_key(
     keyid=None, fingerprint=None, user=None, gnupghome=None, keyring=None
 ):
     """
-    Get a key from the GPG keychain
+    Get a secret key from the GPG keychain
 
     keyid
         The key ID (short or long) of the key to be retrieved.
@@ -753,11 +752,11 @@ def get_secret_key(
 
     user
         Which user's keychain to access, defaults to user Salt is running as.
-        Passing the user as ``salt`` will set the GnuPG home directory to the
+        Passing the user as ``salt`` will set the GnuPG home directory to
         ``/etc/salt/gpgkeys``.
 
     gnupghome
-        Specify the location where GPG keyring and related files are stored.
+        Specify the location where the GPG keyring and related files are stored.
 
     keyring
         Limit the operation to this specific keyring, specified as
@@ -818,21 +817,21 @@ def get_secret_key(
 @_restore_ownership
 def import_key(text=None, filename=None, user=None, gnupghome=None, keyring=None):
     r"""
-    Import a key from text or file
+    Import a key from text or a file
 
     text
-        The text containing to import.
+        The text containing the key to import.
 
     filename
-        The filename containing the key to import.
+        The path of the file containing the key to import.
 
     user
         Which user's keychain to access, defaults to user Salt is running as.
-        Passing the user as ``salt`` will set the GnuPG home directory to the
+        Passing the user as ``salt`` will set the GnuPG home directory to
         ``/etc/salt/gpgkeys``.
 
     gnupghome
-        Specify the location where GPG keyring and related files are stored.
+        Specify the location where the GPG keyring and related files are stored.
 
     keyring
         Limit the operation to this specific keyring, specified as
@@ -900,20 +899,20 @@ def export_key(
 
     user
         Which user's keychain to access, defaults to user Salt is running as.
-        Passing the user as ``salt`` will set the GnuPG home directory to the
+        Passing the user as ``salt`` will set the GnuPG home directory to
         ``/etc/salt/gpgkeys``.
 
     gnupghome
-        Specify the location where GPG keyring and related files are stored.
+        Specify the location where the GPG keyring and related files are stored.
 
     use_passphrase
         Whether to use a passphrase to export the secret key.
-        Passphrase is received from Pillar.
+        Passphrase is retrieved from Pillar value ``gpg_passphrase``.
 
         .. versionadded:: 3003
 
     output
-        The filename where the exported key data will be written to, default is standard out.
+        Instead of printing to standard out, write the output to this path.
 
         .. versionadded:: 3006.0
 
@@ -978,22 +977,22 @@ def export_key(
 @_restore_ownership
 def receive_keys(keyserver=None, keys=None, user=None, gnupghome=None, keyring=None):
     """
-    Receive key(s) from keyserver and add them to keychain
+    Receive key(s) from keyserver and add them to the keychain
 
     keyserver
         Keyserver to use for searching for GPG keys, defaults to pgp.mit.edu
 
     keys
-        The keyID(s) to retrieve from the keyserver.  Can be specified as a comma
+        The keyID(s) to retrieve from the keyserver. Can be specified as a comma
         separated string or a list.
 
     user
         Which user's keychain to access, defaults to user Salt is running as.
-        Passing the user as ``salt`` will set the GnuPG home directory to the
+        Passing the user as ``salt`` will set the GnuPG home directory to
         ``/etc/salt/gpgkeys``.
 
     gnupghome
-        Specify the location where GPG keyring and related files are stored.
+        Specify the location where the GPG keyring and related files are stored.
 
     keyring
         Limit the operation to this specific keyring, specified as
@@ -1058,7 +1057,7 @@ def trust_key(
     keyring=None,
 ):
     """
-    Set the trust level for a key in GPG keychain
+    Set the trust level for a key in the GPG keychain
 
     keyid
         The keyid of the key to set the trust level for.
@@ -1073,11 +1072,11 @@ def trust_key(
 
     user
         Which user's keychain to access, defaults to user Salt is running as.
-        Passing the user as ``salt`` will set the GnuPG home directory to the
+        Passing the user as ``salt`` will set the GnuPG home directory to
         ``/etc/salt/gpgkeys``.
 
     gnupghome
-        Specify the location where GPG keyring and related files are stored.
+        Specify the location where the GPG keyring and related files are stored.
 
         .. versionadded:: 3006
 
@@ -1185,32 +1184,32 @@ def sign(
     keyring=None,
 ):
     """
-    Sign message or file
+    Sign a message or a file
 
     user
         Which user's keychain to access, defaults to user Salt is running as.
-        Passing the user as ``salt`` will set the GnuPG home directory to the
+        Passing the user as ``salt`` will set the GnuPG home directory to
         ``/etc/salt/gpgkeys``.
 
     keyid
-        The keyid of the key to use for signing, defaults to
+        The keyid of the key to use for signing, defaults to the
         first key in the secret keyring.
 
     text
         The text to sign.
 
     filename
-        The filename to sign.
+        The path of the file to sign.
 
     output
-        The filename where the signed file will be written, default is standard out.
+        Instead of printing to standard out, write the output to this path.
 
     use_passphrase
-        Whether to use a passphrase with the signing key. Passphrase is received
-        from Pillar.
+        Whether to use a passphrase with the signing key. Passphrase is retrieved
+        from Pillar value ``gpg_passphrase``.
 
     gnupghome
-        Specify the location where GPG keyring and related files are stored.
+        Specify the location where the GPG keyring and related files are stored.
 
     keyring
         Limit the operation to this specific keyring, specified as
@@ -1262,24 +1261,24 @@ def verify(
     keyring=None,
 ):
     """
-    Verify a message or file
+    Verify a message or a file
 
     text
         The text to verify.
 
     filename
-        The filename to verify.
+        The path of the file to verify.
 
     user
         Which user's keychain to access, defaults to user Salt is running as.
-        Passing the user as ``salt`` will set the GnuPG home directory to the
+        Passing the user as ``salt`` will set the GnuPG home directory to
         ``/etc/salt/gpgkeys``.
 
     gnupghome
-        Specify the location where GPG keyring and related files are stored.
+        Specify the location where the GPG keyring and related files are stored.
 
     signature
-        Specify the filename of a detached signature.
+        Specify the path of a detached signature.
 
         .. versionadded:: 2018.3.0
 
@@ -1367,11 +1366,11 @@ def encrypt(
     keyring=None,
 ):
     """
-    Encrypt a message or file
+    Encrypt a message or a file
 
     user
         Which user's keychain to access, defaults to user Salt is running as.
-        Passing the user as ``salt`` will set the GnuPG home directory to the
+        Passing the user as ``salt`` will set the GnuPG home directory to
         ``/etc/salt/gpgkeys``.
 
     recipients
@@ -1382,10 +1381,10 @@ def encrypt(
         The text to encrypt.
 
     filename
-        The filename to encrypt.
+        The path of the file to encrypt.
 
     output
-        The filename where the signed file will be written, default is standard out.
+        Instead of printing to standard out, write the output to this path.
 
     sign
         Whether to sign, in addition to encrypt, the data. ``True`` to use
@@ -1393,7 +1392,7 @@ def encrypt(
 
     use_passphrase
         Whether to use a passphrase with the signing key.
-        Passphrase is received from Pillar.
+        Passphrase is retrieved from Pillar value ``gpg_passphrase``.
 
     always_trust
         Skip key validation and assume that used keys are fully trusted.
@@ -1401,7 +1400,7 @@ def encrypt(
         .. versionadded:: 3006.0
 
     gnupghome
-        Specify the location where GPG keyring and related files are stored.
+        Specify the location where the GPG keyring and related files are stored.
 
     bare
         If ``True``, return the (armored) encrypted block as a string without
@@ -1488,28 +1487,28 @@ def decrypt(
     keyring=None,
 ):
     """
-    Decrypt a message or file
+    Decrypt a message or a file
 
     user
         Which user's keychain to access, defaults to user Salt is running as.
-        Passing the user as ``salt`` will set the GnuPG home directory to the
+        Passing the user as ``salt`` will set the GnuPG home directory to
         ``/etc/salt/gpgkeys``.
 
     text
         The encrypted text to decrypt.
 
     filename
-        The encrypted filename to decrypt.
+        The path of the encrypted file to decrypt.
 
     output
-        The filename where the decrypted data will be written, default is standard out.
+        Instead of printing to standard out, write the output to this path.
 
     use_passphrase
-        Whether to use a passphrase with the signing key. Passphrase is received
-        from Pillar.
+        Whether to use a passphrase with the signing key. The passphrase is retrieved
+        from Pillar value ``gpg_passphrase``.
 
     gnupghome
-        Specify the location where GPG keyring and related files are stored.
+        Specify the location where the GPG keyring and related files are stored.
 
     bare
         If ``True``, return the (armored) decrypted block as a string without the
