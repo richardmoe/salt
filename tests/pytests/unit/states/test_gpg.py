@@ -115,8 +115,8 @@ def test_gpg_present_no_changes(gpg_receive, gpg_trust):
 @pytest.mark.parametrize(
     "gpg_trust,expected",
     [
-        ({"res": True, "message": ["Setting ownership trust to Marginally"]}, True),
-        ({"res": False, "message": ["KeyID A not in GPG keychain"]}, False),
+        ({"res": True, "message": "Setting ownership trust to Marginally"}, True),
+        ({"res": False, "message": "KeyID A not in GPG keychain"}, False),
     ],
     indirect=["gpg_trust"],
 )
@@ -157,8 +157,8 @@ def test_gpg_present_new_key(gpg_receive, gpg_trust, expected):
 @pytest.mark.parametrize(
     "gpg_trust,expected",
     [
-        ({"res": True, "message": ["Setting ownership trust to Marginally"]}, True),
-        ({"res": False, "message": ["KeyID A not in GPG keychain"]}, False),
+        ({"res": True, "message": "Setting ownership trust to Marginally"}, True),
+        ({"res": False, "message": "KeyID A not in GPG keychain"}, False),
     ],
     indirect=["gpg_trust"],
 )
