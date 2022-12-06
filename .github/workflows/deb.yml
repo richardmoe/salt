@@ -1,0 +1,33 @@
+name: Build x86_65 DEB Package
+
+on:
+  push:
+    branches: [ "x509-v2" ]
+  pull_request:
+    branches: [ "x509-v2" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install build dependencies
+      run: sudo apt-get install -y build-essential devscripts debhelper
+
+    - name: Link debian directory
+      run: ln -s pkg/deb/debian debian
+
+    - name: Build onedir
+      run: debuild -uc -us
+
+    - name: ls dir
+      run: ls `dirname ${{ github.workspace }}`
+
+    - name: Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: packages
+        path: /home/runner/work/salt/salt*deb
